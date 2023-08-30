@@ -21,7 +21,7 @@ class ProjectedAreaScene(Scene):
 
         cdf_ax = Axes(x_range=[x_lower, x_upper, 1],
                       y_range=[-.25, 1.0, .25],
-                      axis_config = {'include_numbers': True})
+                      axis_config = {'include_numbers': True, 'numbers_to_exclude' : [-.25] })
 
         # stack the axes vertically and fit to screen
         VGroup(pdf_ax, cdf_ax) \
@@ -29,7 +29,6 @@ class ProjectedAreaScene(Scene):
             .scale_to_fit_height(6)
 
         # declare PDF function plot and its area
-
         pdf_partial_plot = always_redraw(lambda: pdf_ax.plot(lambda x: norm.pdf(x, mean, std),
                                                   x_range=[x_lower, vt.get_value()],
                                                   color=BLUE)
@@ -49,7 +48,7 @@ class ProjectedAreaScene(Scene):
                                  )
 
         # create the line that connects the PDF and CDF
-        projecting_line = always_redraw(lambda: DashedLine(color=WHITE,
+        projecting_line = always_redraw(lambda: DashedLine(color=YELLOW,
                                                            start=pdf_ax.c2p(vt.get_value(), 0),
                                                            end=cdf_ax.c2p(vt.get_value(),
                                                                           norm.cdf(vt.get_value(), mean, std)
@@ -69,4 +68,4 @@ class ProjectedAreaScene(Scene):
 
 # Execute rendering
 if __name__ == "__main__":
-    os.system( r"manim -qk -v WARNING -p --disable_caching -o ProjectedAreaScene.png scratch_pad.py MyPlotScene")
+    os.system(r"manim -qk -v WARNING -p --disable_caching -o ProjectedAreaScene.png scratch_pad.py MyPlotScene")
