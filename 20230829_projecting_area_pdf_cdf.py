@@ -17,10 +17,12 @@ class ProjectedAreaScene(Scene):
         # declare x and y axes for PDF and CDF
         pdf_ax = Axes(x_range=[x_lower, x_upper, 1],
                       y_range=[-.05, .75, .25],
+                      tips=False,
                       axis_config = {'include_numbers': True })
 
         cdf_ax = Axes(x_range=[x_lower, x_upper, 1],
                       y_range=[-.25, 1.0, .25],
+                      tips=False,
                       axis_config = {'include_numbers': True, 'numbers_to_exclude' : [-.25] })
 
         # stack the axes vertically and fit to screen
