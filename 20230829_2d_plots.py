@@ -59,4 +59,4 @@ class MyPlotSceneAnimated(Scene):
 # Execute rendering
 if __name__ == "__main__":
     # os.system( r"manim -qk -v WARNING -p --disable_caching -o MyPlotScene.png scratch_pad.py MyPlotScene")
-    os.system( r"manim -qk -v WARNING -p --disable_caching -o MyPlotScene.mp4 scratch_pad.py MyPlotSceneAnimated")
+    os.system( r"manim -qk -v WARNING -p --disable_caching -o MyPlotScene.mp4 20230829_2d_plots.py MyPlotSceneAnimated")
