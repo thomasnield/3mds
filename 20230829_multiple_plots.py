@@ -2,7 +2,6 @@ from manim import *
 from scipy.stats import norm
 import os
 
-
 class ProjectedAreaScene(Scene):
     def construct(self):
 
@@ -70,4 +69,4 @@ class ProjectedAreaScene(Scene):
 
 # Execute rendering
 if __name__ == "__main__":
-    os.system(r"manim -qk -v WARNING -p --disable_caching -o ProjectedAreaScene.png scratch_pad.py MyPlotScene")
+    os.system(r"manim -qk -v WARNING -p --disable_caching -o ProjectedAreaScene.mp4 20230829_multiple_plots.py ProjectedAreaScene")
