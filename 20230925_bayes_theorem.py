@@ -241,4 +241,4 @@ class VennDiagramBayes(MovingCameraScene):
 
 
 if __name__ == "__main__":
-    render_scenes(q='k')
+    os.system( r"manim -qk -v WARNING -p --disable_caching -o VennDiagramBayes.mp4 20230925_bayes_theorem.py VennDiagramBayes")
