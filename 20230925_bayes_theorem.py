@@ -1,5 +1,6 @@
 
 from manim import *
+from threemds.utils import render_scenes
 
 class BayesTheorem(Scene):
     def construct(self):
@@ -59,16 +60,16 @@ class VideoGameHomicidalExample1(Scene):
     def construct(self):
         self.add(Tex("Bayes Theorem", color=BLUE).scale(1.3).to_edge(UL))
 
-        p_homicidal_gamer = MathTex(r"P(", r"\text{homicidal}", r"|", r"\text{gamer}", r")", "=", ".85").scale(1.3)
-        p_homicidal_gamer[1].set_color(RED)
-        p_homicidal_gamer[3].set_color(BLUE)
+        p_homicidal_gamer = MathTex(r"P(", r"\text{gamer}", r"|", r"\text{homicidal}", r")", "=", ".85").scale(1.3)
+        p_homicidal_gamer[1].set_color(BLUE)
+        p_homicidal_gamer[3].set_color(RED)
 
         self.play(Write(p_homicidal_gamer))
         self.wait()
 
-        p_gamer_homicidal = MathTex(r"P(", r"\text{gamer}", r"|", r"\text{homicidal}", r")", "=", r"\text{ ? }").scale(1.3)
-        p_gamer_homicidal[1].set_color(BLUE)
-        p_gamer_homicidal[3].set_color(RED)
+        p_gamer_homicidal = MathTex(r"P(", r"\text{homicidal}", r"|", r"\text{gamer}", r")", "=", r"\text{ ? }").scale(1.3)
+        p_gamer_homicidal[1].set_color(RED)
+        p_gamer_homicidal[3].set_color(BLUE)
 
         VGroup(p_homicidal_gamer.generate_target(), p_gamer_homicidal).arrange(DOWN, buff=.75)
 
@@ -79,14 +80,14 @@ class VideoGameHomicidalExample2(Scene):
     def construct(self):
 
         stats = VGroup(
-            MathTex(r"P(", r"\text{homicidal}", r"|", r"\text{gamer}", r")", "=", ".85"),
+            MathTex(r"P(", r"\text{gamer}", r"|", r"\text{homicidal}", r")", "=", ".85"),
             MathTex(r"P(", r"\text{Gamer}", ") = .19"),
             MathTex(r"P(", r"\text{Homicidal}", ") = .0001"),
-            MathTex(r"P(", r"\text{gamer}", r"|", r"\text{homicidal}", r")", "=", r"\text{ ? }")
+            MathTex(r"P(", r"\text{homicidal}", r"|", r"\text{gamer}", r")", "=", r"\text{ ? }")
         ).scale(1.3).arrange(DOWN, buff=.75)
 
-        VGroup(stats[0][1], stats[2][1], stats[3][3]).set_color(RED)
-        VGroup(stats[0][3], stats[1][1], stats[3][1]).set_color(BLUE)
+        VGroup(stats[0][3], stats[2][1], stats[3][1]).set_color(RED)
+        VGroup(stats[0][1], stats[1][1], stats[3][3]).set_color(BLUE)
 
         for m in stats:
             self.play(Write(m), lag_ratio=2)
@@ -241,4 +242,4 @@ class VennDiagramBayes(MovingCameraScene):
 
 
 if __name__ == "__main__":
-    os.system( r"manim -qk -v WARNING -p --disable_caching -o VennDiagramBayes.mp4 20230925_bayes_theorem.py VennDiagramBayes")
+    render_scenes(q='k', scene_names=['VideoGameHomicidalExample2', 'VideoGameHomicidalExample1'])
