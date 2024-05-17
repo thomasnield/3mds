@@ -91,12 +91,57 @@ class TeacupScene(Scene):
 
         self.play(Write(coincidence))
         self.wait()
+        self.play(Unwrite(coincidence))
+        self.wait()
 
-        # Define null hypothesis
+        # go back to rounded floating point value
+        tex4 = MathTex(r"p = ", r".014", color=YELLOW, font_size=60) \
+            .move_to(tex3, aligned_edge=LEFT)
 
-        # Define alternative hypothesis
+        self.play(
+            ReplacementTransform(tex3[0], tex4[0]),
+            FadeIn(tex4[1][1]),
+            ReplacementTransform(tex3[1][1], tex4[1][0]),
+            ReplacementTransform(tex3[1][0], tex4[1][2]),
+            ReplacementTransform(tex3[1][2], tex4[1][3]),
+            FadeOut(tex3[1][-1])
+        )
+        self.wait()
 
-        # Define p-value threshold
+        # Define null hypothesis and alternative hypothesis
+        h_group = VGroup(
+            MathTex(r"H_0 = \text{She was guessing! }"), MathTex(r"P \ge .05"),
+            MathTex(r"H_1 = \text{She has a talent! }"), MathTex(r"P < .05")
+        ).arrange_in_grid(rows=2,cols=2, col_alignments=['l','l']) \
+        .next_to(tex3, DOWN, aligned_edge=LEFT)
+
+        for m in h_group:
+            self.play(Write(m))
+            self.wait()
+
+        h0 = Tex("Null Hypothesis", color=BLUE, font_size=60) \
+            .next_to(h_group, DOWN, aligned_edge=LEFT) \
+            .to_edge(DOWN)
+
+        h1 = Tex("Alternative Hypothesis", color=BLUE, font_size=60) \
+            .next_to(h_group, DOWN, aligned_edge=LEFT) \
+            .to_edge(DOWN)
+
+        self.play(Circumscribe(h_group[:2]), FadeIn(h0))
+        self.wait()
+        self.play(FadeOut(h0))
+        self.wait()
+        self.play(Circumscribe(h_group[2:4]), FadeIn(h1))
+        self.wait()
+        self.play(FadeOut(h1))
+        self.wait()
+
+        # Highlight the alternative hypothesis and strike through null hypothesis
+        strikethru = Line(start=h_group[0].get_left(), end=h_group[1].get_right(), color=YELLOW)
+        self.play(Write(strikethru))
+        self.wait()
+        self.play(Indicate(h_group[2:4]))
+        self.wait()
 
 
 
