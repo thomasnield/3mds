@@ -84,6 +84,14 @@ class TeacupScene(Scene):
 
         self.wait()
 
+        # Coincidence?
+        coincidence = Tex("Coincidence?", color=RED, font_size=60)  \
+            .rotate(45 * DEGREES) \
+            .next_to(tex3, direction=DR, buff=0)
+
+        self.play(Write(coincidence))
+        self.wait()
+
         # Define null hypothesis
 
         # Define alternative hypothesis
