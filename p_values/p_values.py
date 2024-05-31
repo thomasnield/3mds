@@ -1,5 +1,6 @@
 import os, pathlib
 from manim import *
+from scipy.stats import norm
 
 config.quality = "low_quality"
 config.preview = True
@@ -18,7 +19,6 @@ class Teacup(SVGMobject):
 class Teakettle(SVGMobject):
     def __init__(self, fill_color: str) -> None:
         super().__init__(file_name=get_svg("coffee-tea-kettle-icon.svg"), fill_color=fill_color)
-
 
 class TeacupScene(Scene):
     def construct(self):
@@ -119,11 +119,11 @@ class TeacupScene(Scene):
             self.play(Write(m))
             self.wait()
 
-        h0 = Tex("Null Hypothesis", color=BLUE, font_size=60) \
+        h0 = Tex("Null Hypothesis", color=PURPLE, font_size=60) \
             .next_to(h_group, DOWN, aligned_edge=LEFT) \
             .to_edge(DOWN)
 
-        h1 = Tex("Alternative Hypothesis", color=BLUE, font_size=60) \
+        h1 = Tex("Alternative Hypothesis", color=PURPLE, font_size=60) \
             .next_to(h_group, DOWN, aligned_edge=LEFT) \
             .to_edge(DOWN)
 
@@ -143,9 +143,54 @@ class TeacupScene(Scene):
         self.play(Indicate(h_group[2:4]))
         self.wait()
 
+class ColdTestScene(Scene):
+    def construct(self):
+        # declare normal distribution
+        mean = 18
+        std = 1.5
+        f = lambda x: norm.pdf(x, mean, std)
+
+        # declare axis
+        ax = Axes(x_range=[mean-4*std, mean+4*std, std],
+                    y_range=[0, f(mean) + .1, (f(mean) + .1) / 4],
+                    x_axis_config={"include_numbers": True,
+                                   "numbers_to_exclude": [mean - 4 * std]
+                                   },
+                    y_axis_config={"include_numbers": True,
+                                   "decimal_number_config": {
+                                       "num_decimal_places": 2
+                                   }
+                                   }
+                    )
+        self.play(Write(ax))
+        self.wait()
+
+        # declare plot
+        plt = ax.plot(f, color=BLUE)
+        self.play(Write(plt))
+        self.wait()
+
+        z_tracker = ValueTracker(.0001)
+        # shade area
+        area = always_redraw(lambda: ax.get_area(plt,x_range=(mean-z_tracker.get_value()*std, mean+z_tracker.get_value()*std)))
+        self.add(area)
+
+        self.play(z_tracker.animate.set_value(4))
+        self.wait()
+        a_txt = MathTex("A = 1.0").move_to(plt.get_center())
+        self.play(Write(a_txt))
+        self.wait()
+
+        # transform area to .95
+        self.play(z_tracker.animate.set_value(2),
+            a_txt.animate.become(MathTex("A = .95").move_to(plt.get_center()))
+        )
+        self.wait()
+
 
 
 # Execute rendering
 if __name__ == "__main__":
     #os.system(r"manim -qk -v WARNING -p --disable_caching -o TeacupScene.png p_values/p_values.py TeacupScene")
-    os.system(r"manim p_values.py TeacupScene")
+    #os.system(r"manim p_values.py TeacupScene")
+    os.system(r"manim p_values.py ColdTestScene")
