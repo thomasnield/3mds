@@ -143,6 +143,11 @@ class TeacupScene(Scene):
         self.play(Indicate(h_group[2:4]))
         self.wait()
 
+class Pill(SVGMobject):
+    def __init__(self) -> None:
+        super().__init__(file_name=get_svg("pill.svg"))
+
+
 class ColdTestScene(Scene):
     def construct(self):
         # declare normal distribution
@@ -170,24 +175,52 @@ class ColdTestScene(Scene):
         self.play(Write(plt))
         self.wait()
 
-        z_tracker = ValueTracker(.0001)
+        z_tracker = ValueTracker(.001)
+
         # shade area
+        def area_for_z(z: float): return 1 - 2*norm.cdf(-z)
         area = always_redraw(lambda: ax.get_area(plt,x_range=(mean-z_tracker.get_value()*std, mean+z_tracker.get_value()*std)))
         self.add(area)
 
         self.play(z_tracker.animate.set_value(4))
         self.wait()
-        a_txt = MathTex("A = 1.0").move_to(plt.get_center())
+        a_txt = always_redraw(lambda: MathTex("A =", round(area_for_z(z_tracker.get_value()), 2))
+                              .move_to(plt.get_center())
+                              )
         self.play(Write(a_txt))
         self.wait()
 
         # transform area to .95
-        self.play(z_tracker.animate.set_value(2),
-            a_txt.animate.become(MathTex("A = .95").move_to(plt.get_center()))
-        )
+        self.play(z_tracker.animate.set_value(2))
         self.wait()
 
+        # transform area to .68
+        self.play(z_tracker.animate.set_value(1) )
+        self.wait()
 
+        # transform area to .95
+        self.play(z_tracker.animate.set_value(2))
+        self.wait()
+
+        # draw dashed line and pill
+        pill_x_vt = ValueTracker(16)
+        line = always_redraw(lambda:
+                             DashedLine(start=ax.c2p(pill_x_vt.get_value(),0), end=ax.c2p(pill_x_vt.get_value(), f(pill_x_vt.get_value())))
+                             )
+
+        pill = Pill().rotate(45*DEGREES).scale(.5)
+        pill.add_updater(lambda mobj: mobj.next_to(line, UL))
+        area.clear_updaters()
+
+        self.play(Write(line))
+        self.wait()
+        self.play(FadeIn(pill))
+        self.wait()
+        self.play(area.animate.set_color(RED))
+        self.wait()
+
+        self.play(pill_x_vt.animate.set_value(14.5), area.animate.set_color(GREEN))
+        self.wait()
 
 # Execute rendering
 if __name__ == "__main__":
