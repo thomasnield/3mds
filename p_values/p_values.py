@@ -2,10 +2,10 @@ import os, pathlib
 from manim import *
 from scipy.stats import norm
 
-config.quality = "fourk_quality"
+config.quality = "low_quality"
 config.preview = True
 config.verbosity = "WARNING"
-config.disable_caching = True
+config.disable_caching = False
 
 # where graphics are stored
 resources_folder = os.path.join(pathlib.Path(__file__).parent.resolve(), "resources")
@@ -145,7 +145,7 @@ class Pill(SVGMobject):
         super().__init__(file_name=get_svg("pill.svg"))
 
 
-class ColdTestScene(Scene):
+class ColdTestScene(MovingCameraScene):
     def construct(self):
         # declare normal distribution
         mean = 18
@@ -154,6 +154,7 @@ class ColdTestScene(Scene):
 
         # declare axis
         ax = Axes(x_range=[mean-4*std, mean+4*std, std],
+                    tips=False,
                     y_range=[0, f(mean) + .1, (f(mean) + .1) / 4],
                     x_axis_config={"include_numbers": True,
                                    "numbers_to_exclude": [mean - 4 * std]
@@ -223,18 +224,30 @@ class ColdTestScene(Scene):
 
         self.play(Write(h_group[0]), Write(h_group[1]))
         self.wait()
-        self.play(Write(h_group[2]),Write(h_group[3]))
+        self.play(Write(h_group[2]), Write(h_group[3]))
         self.wait()
 
         # trace pill to successful test
         self.play(area.animate.set_color(RED))
         self.wait()
-        self.play(pill_x_vt.animate.set_value(14.9), area.animate.set_color(GREEN))
+        self.play(pill_x_vt.animate.set_value(14.9), area.animate.set_color(BLUE))
+        self.wait()
+
+        # zoom in on area
+        self.camera.frame.save_state()
+        self.play(self.camera.frame.animate.scale(.5).move_to(pill))
+        self.wait()
+        diff_area = ax.get_area(plt, x_range=(pill_x_vt.get_value(), mean-2*std), color=YELLOW)
+        self.play(FadeIn(diff_area))
+        self.play(FadeOut(diff_area))
+        self.wait()
+        self.play(Restore(self.camera.frame))
         self.wait()
 
         # show p-value area
         self.play(FadeOut(area, a_txt))
         self.wait()
+
 
         # draw left tail
         lower_vt = ValueTracker(pill_x_vt.get_value())
@@ -288,5 +301,5 @@ class ColdTestScene(Scene):
 
 # Execute rendering
 if __name__ == "__main__":
-    os.system(r"manim p_values.py TeacupScene")
+    #os.system(r"manim p_values.py TeacupScene")
     os.system(r"manim p_values.py ColdTestScene")
