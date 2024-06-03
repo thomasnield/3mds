@@ -115,10 +115,6 @@ class TeacupScene(Scene):
         ).arrange_in_grid(rows=2,cols=2, col_alignments=['l','l']) \
         .next_to(tex3, DOWN, aligned_edge=LEFT)
 
-        for m in h_group:
-            self.play(Write(m))
-            self.wait()
-
         h0 = Tex("Null Hypothesis", color=PURPLE, font_size=60) \
             .next_to(h_group, DOWN, aligned_edge=LEFT) \
             .to_edge(DOWN)
@@ -127,14 +123,15 @@ class TeacupScene(Scene):
             .next_to(h_group, DOWN, aligned_edge=LEFT) \
             .to_edge(DOWN)
 
-        self.play(Circumscribe(h_group[:2]), FadeIn(h0))
-        self.wait()
-        self.play(FadeOut(h0))
-        self.wait()
-        self.play(Circumscribe(h_group[2:4]), FadeIn(h1))
-        self.wait()
-        self.play(FadeOut(h1))
-        self.wait()
+        hypothesis_texs = VGroup(h0, h1)
+
+        for m,h in zip((h_group[:2], h_group[2:4]), (h0, h1)):
+            self.play(Write(m))
+            self.wait()
+            self.play(Circumscribe(m), FadeIn(h))
+            self.wait()
+            self.play(FadeOut(h))
+
 
         # Highlight the alternative hypothesis and strike through null hypothesis
         strikethru = Line(start=h_group[0].get_left(), end=h_group[1].get_right(), color=YELLOW)
@@ -211,19 +208,85 @@ class ColdTestScene(Scene):
         pill = Pill().rotate(45*DEGREES).scale(.5)
         pill.add_updater(lambda mobj: mobj.next_to(line, UL))
         area.clear_updaters()
-
         self.play(Write(line))
         self.wait()
         self.play(FadeIn(pill))
         self.wait()
-        self.play(area.animate.set_color(RED))
+
+        # H0 and H1
+        h_group = VGroup(
+            MathTex(r"H_0 : \mu = 18 }"), MathTex(r"P \ge .05", color=YELLOW),
+            MathTex(r"H_1 : \mu \ne 18"), MathTex(r"P < .05", color=YELLOW)
+        ).arrange_in_grid(rows=2, cols=2, col_alignments=['l', 'l']) \
+        .scale(.8) \
+        .to_corner(UR)
+
+        self.play(Write(h_group[0]), Write(h_group[1]))
+        self.wait()
+        self.play(Write(h_group[2]),Write(h_group[3]))
         self.wait()
 
-        self.play(pill_x_vt.animate.set_value(14.5), area.animate.set_color(GREEN))
+        # trace pill to successful test
+        self.play(area.animate.set_color(RED))
+        self.wait()
+        self.play(pill_x_vt.animate.set_value(14.9), area.animate.set_color(GREEN))
+        self.wait()
+
+        # show p-value area
+        self.play(FadeOut(area, a_txt))
+        self.wait()
+
+        # draw left tail
+        lower_vt = ValueTracker(pill_x_vt.get_value())
+        upper_vt = ValueTracker(pill_x_vt.get_value())
+
+        left_tail = always_redraw(lambda:
+                                  ax.get_area(plt, x_range=(lower_vt.get_value(), upper_vt.get_value()), color=RED)
+                                  )
+        self.add(left_tail)
+        self.play(lower_vt.animate.set_value(mean-4*std), run_time=3)
+        self.wait()
+
+        # show area
+        tail_label = MathTex(round(norm.cdf(pill_x_vt.get_value(),loc=mean, scale=std), 4)) \
+                                        .move_to(plt.get_center())
+
+
+        left_tail_line = Line(start=left_tail.get_right()+.25*LEFT+.125*DOWN, end=tail_label.get_left()+.25*DL)
+
+        self.play(Write(left_tail_line), run_time=3)
+        self.wait()
+        self.play(Write(tail_label))
+        self.wait()
+
+        # copy right tail
+        right_tail = left_tail.copy()
+
+        self.play(FadeIn(right_tail))
+        self.play(Rotate(right_tail, angle=-180*DEGREES, axis=Y_AXIS, about_point=ORIGIN), run_time=2)
+        self.wait()
+
+        # label p-value areas
+        self.play(Rotate(left_tail_line.copy(), angle=-180*DEGREES, axis=Y_AXIS, about_point=ORIGIN),
+                  tail_label.animate.become(MathTex(round(norm.cdf(pill_x_vt.get_value(),loc=mean, scale=std)*2, 4)) \
+                                        .move_to(plt.get_center())),
+                  run_time=2)
+        self.wait()
+
+        p_value_label = Tex("p-value", color=YELLOW).scale(.6).next_to(tail_label, DOWN)
+        self.play(Circumscribe(tail_label), FadeIn(p_value_label))
+        self.wait()
+
+        # Highlight the alternative hypothesis and strike through null hypothesis
+
+        strikethru = Line(start=h_group[0].get_left(), end=h_group[1].get_right(), color=YELLOW)
+        self.play(Write(strikethru))
+        self.wait()
+
+        self.play(Indicate(tail_label), Indicate(VGroup(h_group[2], h_group[3])))
         self.wait()
 
 # Execute rendering
 if __name__ == "__main__":
-    #os.system(r"manim -qk -v WARNING -p --disable_caching -o TeacupScene.png p_values/p_values.py TeacupScene")
     #os.system(r"manim p_values.py TeacupScene")
     os.system(r"manim p_values.py ColdTestScene")
