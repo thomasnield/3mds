@@ -2,7 +2,7 @@ import os, pathlib
 from manim import *
 from scipy.stats import norm
 
-config.quality = "low_quality"
+config.quality = "fourk_quality"
 config.preview = True
 config.verbosity = "WARNING"
 config.disable_caching = True
@@ -288,5 +288,5 @@ class ColdTestScene(Scene):
 
 # Execute rendering
 if __name__ == "__main__":
-    #os.system(r"manim p_values.py TeacupScene")
+    os.system(r"manim p_values.py TeacupScene")
     os.system(r"manim p_values.py ColdTestScene")
