@@ -314,15 +314,13 @@ class ColdTestScene(MovingCameraScene):
 
 class ClosingCard(Scene):
   def construct(self):
-    urllib.request.urlretrieve(r"https://images-na.ssl-images-amazon.com/images/I/51yHtuQ9wAL._SX379_BO1,204,203,200_.jpg", "image1.jpg")
-    urllib.request.urlretrieve(r"https://images-na.ssl-images-amazon.com/images/I/41khDop3M4L._SX379_BO1,204,203,200_.jpg", "image2.jpg")
 
     title = Text("Get 10-Day Free Access") \
         .set_color(BLUE).to_edge(UL)
 
     books = Group(
-      ImageMobject(r"image1.jpg"),
-      ImageMobject(r"image2.jpg")
+      ImageMobject(r"resources/book1.jpg"),
+      ImageMobject(r"resources/book2.jpg")
     ).scale(.9).arrange(RIGHT,buff=.8).next_to(title,DOWN,buff=.8,aligned_edge=LEFT)
 
     source_code = Tex("My books, live trainings, courses and more!", color=BLUE) \
