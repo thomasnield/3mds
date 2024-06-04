@@ -1,8 +1,10 @@
 import os, pathlib
 from manim import *
 from scipy.stats import norm
+import os
+import urllib.request
 
-config.quality = "low_quality"
+config.quality = "fourk_quality"
 config.preview = True
 config.verbosity = "WARNING"
 config.disable_caching = False
@@ -19,6 +21,16 @@ class Teacup(SVGMobject):
 class Teakettle(SVGMobject):
     def __init__(self, fill_color: str) -> None:
         super().__init__(file_name=get_svg("coffee-tea-kettle-icon.svg"), fill_color=fill_color)
+
+class TitleScene(Scene):
+
+    def construct(self):
+        title = Text("P-values")
+        subtitle = Text("in 3 Minutes",color=BLUE).scale(.75).next_to(title, DOWN)
+
+        self.play(FadeIn(title), FadeIn(subtitle), run_time=2)
+        self.wait()
+        self.play(FadeOut(title), FadeOut(subtitle), run_time=2)
 
 class TeacupScene(Scene):
     def construct(self):
@@ -299,7 +311,116 @@ class ColdTestScene(MovingCameraScene):
         self.play(Indicate(tail_label), Indicate(VGroup(h_group[2], h_group[3])))
         self.wait()
 
+
+class ClosingCard(Scene):
+  def construct(self):
+    urllib.request.urlretrieve(r"https://images-na.ssl-images-amazon.com/images/I/51yHtuQ9wAL._SX379_BO1,204,203,200_.jpg", "image1.jpg")
+    urllib.request.urlretrieve(r"https://images-na.ssl-images-amazon.com/images/I/41khDop3M4L._SX379_BO1,204,203,200_.jpg", "image2.jpg")
+
+    title = Text("Get 10-Day Free Access") \
+        .set_color(BLUE).to_edge(UL)
+
+    books = Group(
+      ImageMobject(r"image1.jpg"),
+      ImageMobject(r"image2.jpg")
+    ).scale(.9).arrange(RIGHT,buff=.8).next_to(title,DOWN,buff=.8,aligned_edge=LEFT)
+
+    source_code = Tex("My books, live trainings, courses and more!", color=BLUE) \
+        .next_to(books, DOWN, aligned_edge=LEFT,buff=1)
+
+    email = Text(r"See link in the description") \
+        .scale(.5) \
+        .next_to(source_code, DOWN, aligned_edge=LEFT)
+
+    self.play(*[FadeIn(mobj) for mobj in (title, books, source_code, email)])
+
+    self.wait(29)
+
+class LogoScene(Scene):
+
+    def construct(self):
+        circle = Circle(1.0, color=BLUE)
+        rectangle = Rectangle(height=1.0, width=2.0, color=BLUE).move_to(circle, UP)
+
+        handle = RoundedRectangle(corner_radius=.5, height=1.5, width=2.0, color=BLUE) \
+            .move_to(circle).shift(LEFT * .8)
+
+        handle_inner = Difference(handle, handle.copy().scale(.8), color=BLUE, fill_opacity=0.0)
+
+        cup = VGroup(circle, rectangle, handle_inner)
+
+        self.play(
+            Create(cup)
+        )
+
+        self.play(
+            cup.animate.set_fill(BLUE, opacity=1)
+        )
+
+        # create sin wave steam
+
+        def get_sine_wave(dx=0):
+            return FunctionGraph(
+                lambda x: np.sin((x + dx)),
+                x_range=[-3, 3]
+            )
+
+        sine_function = get_sine_wave()
+        d_theta = ValueTracker(0)
+
+        def update_wave(func):
+            func.become(
+                get_sine_wave(dx=d_theta.get_value())
+            )
+            return func
+
+        sine_function.add_updater(update_wave)
+
+        self.play(Create(sine_function))
+        self.play(d_theta.animate.increment_value(4 * PI), run_time=2)
+
+        # create steam functions
+        steam_functions = []
+        steam_waves = VGroup()
+        for i in range(3):
+            steam_function = get_sine_wave() \
+                .rotate(PI / 2.0) \
+                .scale(.2) \
+                .next_to(cup, UP) \
+                .shift([i * .5, 0, 0])
+
+            steam_waves.add(steam_function)
+
+            d_theta = ValueTracker(0)
+
+            def update_wave(func, d=d_theta, i=i):
+                func.become(
+                    get_sine_wave(dx=d.get_value()) \
+                        .rotate(PI / 2.0) \
+                        .scale(.2) \
+                        .next_to(cup, UP) \
+                        .shift([i * .5, 0, 0])
+                )
+                return func
+
+            steam_function.add_updater(update_wave)
+
+            steam_functions += d_theta
+
+            self.play(Create(steam_function), run_time=.3)
+
+        text = Text("3-Minute Data Science").scale(.8).shift(DOWN * 1.5)
+        self.play(Write(text), run_time=.5)
+        #mobj_to_svg(VGroup(cup, steam_waves, sine_function), 'logo.svg', h_padding=1)
+        self.play(*(d.animate.increment_value(4 * PI) for d in steam_functions), run_time=8, rate_func=linear)
+        self.wait()
+
+
 # Execute rendering
 if __name__ == "__main__":
+    #os.system(r"manim p_values.py TitleScene")
     #os.system(r"manim p_values.py TeacupScene")
-    os.system(r"manim p_values.py ColdTestScene")
+    #os.system(r"manim p_values.py ColdTestScene")
+    #os.system(r"manim p_values.py LogoScene")
+    os.system(r"manim p_values.py ClosingCard")
+
