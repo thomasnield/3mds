@@ -1,8 +1,7 @@
-import os, pathlib
+import pathlib
 from manim import *
 from scipy.stats import norm
 import os
-import urllib.request
 
 config.quality = "fourk_quality"
 config.preview = True
@@ -416,9 +415,9 @@ class LogoScene(Scene):
 
 # Execute rendering
 if __name__ == "__main__":
-    #os.system(r"manim p_values.py TitleScene")
-    #os.system(r"manim p_values.py TeacupScene")
-    #os.system(r"manim p_values.py ColdTestScene")
-    #os.system(r"manim p_values.py LogoScene")
+    os.system(r"manim p_values.py TitleScene")
+    os.system(r"manim p_values.py TeacupScene")
+    os.system(r"manim p_values.py ColdTestScene")
+    os.system(r"manim p_values.py LogoScene")
     os.system(r"manim p_values.py ClosingCard")
 
