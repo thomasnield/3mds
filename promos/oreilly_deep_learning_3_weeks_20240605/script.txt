@@ -1,0 +1,3 @@
+Hey everybody, I’m Thomas Nield from 3-Minute Data Science, also the author of “Essential Math for Data Science” and “Getting Started with SQL”. I am excited to announce that I will be doing a Deep Learning for Beginners in 3 Weeks starting on June 11th. We will meet 2 hours a week for 3 weeks studying how to build a neural network completely from scratch in Python, including backpropagation and gradient descent. We will focus on a simple problem of predicting a light or dark font for a given background color, and then discuss how computer vision and self-driving cars work.  
+
+With a 10-day free trial, you can access the first two sessions for free and get access to the enormous library that O’Reilly authors. Please click the link below and I hope to see you there!
