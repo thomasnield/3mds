@@ -1,0 +1,2 @@
+*.mkv,[[:space:]]*.m4a,[[:space:]]*.mp4,[[:space:]]*.jpg,[[:space:]]*.png filter=lfs diff=lfs merge=lfs -text
+*.mov filter=lfs diff=lfs merge=lfs -text
